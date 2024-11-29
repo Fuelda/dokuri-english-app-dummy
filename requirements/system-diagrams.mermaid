@@ -1,0 +1,152 @@
+%% 1. シーケンス図：学習フロー
+sequenceDiagram
+    actor User
+    participant Client
+    participant Supabase
+    participant TTS as Text-to-Speech API
+
+    User->>Client: 学習開始
+    Client->>Supabase: 認証チェック
+    Supabase-->>Client: 認証OK
+    
+    loop 学習セッション
+        Client->>Client: 問題選択
+        Client->>TTS: 音声生成リクエスト
+        TTS-->>Client: 音声データ
+        Client->>User: 音声再生
+        User->>Client: 回答入力
+        Client->>Supabase: 学習記録保存
+        Supabase-->>Client: 保存完了
+        Client->>Client: 次の問題準備
+    end
+
+%% 2. ユースケース図
+stateDiagram-v2
+    [*] --> Login
+    Login --> Dashboard: ログイン成功
+    Dashboard --> NewStudy: 新規学習
+    Dashboard --> Review: 復習
+    Dashboard --> MixedStudy: 混合学習
+    Dashboard --> IncorrectList: 誤答確認
+    NewStudy --> Answer
+    Review --> Answer
+    MixedStudy --> Answer
+    Answer --> [*]: 学習終了
+
+%% 3. クラス図
+classDiagram
+    class User {
+        +String id
+        +String email
+        +login()
+        +logout()
+    }
+    class StudySession {
+        +String id
+        +String userId
+        +StudyMode mode
+        +startSession()
+        +endSession()
+    }
+    class StudyRecord {
+        +String id
+        +String userId
+        +String sentenceId
+        +Int result
+        +DateTime nextReview
+        +Boolean mastered
+        +save()
+    }
+    class Sentence {
+        +String id
+        +String content
+        +getAudio()
+    }
+    User "1" -- "*" StudySession
+    User "1" -- "*" StudyRecord
+    StudySession "1" -- "*" StudyRecord
+    StudyRecord "*" -- "1" Sentence
+
+%% 4. アクティビティ図
+stateDiagram-v2
+    [*] --> SelectMode
+    SelectMode --> GetQuestion
+    GetQuestion --> PlayAudio
+    PlayAudio --> UserAnswer
+    UserAnswer --> SaveRecord
+    SaveRecord --> CheckContinue
+    CheckContinue --> GetQuestion: 継続
+    CheckContinue --> [*]: 終了
+
+%% 5. 状態遷移図
+stateDiagram-v2
+    [*] --> New
+    New --> InProgress: 開始
+    InProgress --> Answered: 回答
+    Answered --> Mastered: 完璧
+    Answered --> Review: 要復習
+    Review --> InProgress: 再学習
+    Mastered --> [*]
+
+%% 6. ER図
+erDiagram
+    Users ||--o{ StudyRecords : "creates"
+    StudyRecords }o--|| Sentences : "references"
+    
+    Users {
+        uuid id PK
+        string email
+        timestamp created_at
+    }
+    StudyRecords {
+        uuid id PK
+        uuid user_id FK
+        string sentence_id FK
+        integer result
+        timestamp next_review
+        boolean mastered
+        timestamp created_at
+    }
+    Sentences {
+        string id PK
+        string content
+    }
+
+%% 7. データフロー図
+flowchart TD
+    User((ユーザー))
+    Client[クライアント]
+    Auth[認証システム]
+    DB[(データベース)]
+    TTS[音声合成API]
+
+    User -->|操作| Client
+    Client -->|認証| Auth
+    Client -->|データ取得/保存| DB
+    Client -->|音声リクエスト| TTS
+    TTS -->|音声データ| Client
+    Client -->|表示/再生| User
+
+%% 8. コンポーネント図
+flowchart TD
+    A[App] --> B[Layout]
+    B --> C[Navigation]
+    B --> D[Main Content]
+    D --> E[Study Session]
+    D --> F[Audio Player]
+    D --> G[Answer Buttons]
+    E --> H[Session Manager]
+    H --> I[State Manager]
+    I --> J[API Client]
+
+%% 9. デプロイメント図
+flowchart TD
+    Browser[ブラウザ]
+    Netlify[Netlify]
+    Supabase[Supabase]
+    GCP[Google Cloud TTS]
+
+    Browser -->|HTTPS| Netlify
+    Netlify -->|API| Supabase
+    Netlify -->|API| GCP
+
