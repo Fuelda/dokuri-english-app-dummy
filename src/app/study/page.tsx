@@ -23,24 +23,13 @@ export default async function StudyPage({
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white border-b">
-        <div className="max-w-2xl mx-auto px-4 py-4 flex items-center">
-          <button
-            onClick={() => window.history.back()}
-            className="text-gray-700"
-          >
-            ← 戻る
-          </button>
-        </div>
-      </header>
-
-      <main className="max-w-2xl mx-auto px-4 py-8">
+    <main className="max-w-2xl mx-auto px-4 py-8">
+      <div className="space-y-6">
         <StudySession
           mode={mode as "new" | "review" | "mixed"}
           userId={session.user.id}
         />
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
