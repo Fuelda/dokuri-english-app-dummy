@@ -38,13 +38,17 @@ export async function middleware(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession();
 
+  // 認証が不要なパス
+  const publicPaths = ["/login", "/signup"];
+  const isPublicPath = publicPaths.includes(request.nextUrl.pathname);
+
   // 認証が必要なページへのアクセスをチェック
-  if (!session && !request.nextUrl.pathname.startsWith("/login")) {
+  if (!session && !isPublicPath) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  // ログイン済みユーザーのログインページへのアクセスをチェック
-  if (session && request.nextUrl.pathname.startsWith("/login")) {
+  // ログイン済みユーザーのログイン/サインアップページへのアクセスをチェック
+  if (session && isPublicPath) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
