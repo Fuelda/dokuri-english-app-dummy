@@ -29,16 +29,16 @@ export const sentences: Sentence[] = [
     id: "7",
     content: "I'm looking forward to seeing you.",
   },
-  {
-    id: "8",
-    content: "Would you like something to drink?",
-  },
-  {
-    id: "9",
-    content: "Can you help me with this problem?",
-  },
-  {
-    id: "10",
-    content: "Let's meet again next week.",
-  },
+  // {
+  //   id: "8",
+  //   content: "Would you like something to drink?",
+  // },
+  // {
+  //   id: "9",
+  //   content: "Can you help me with this problem?",
+  // },
+  // {
+  //   id: "10",
+  //   content: "Let's meet again next week.",
+  // },
 ];

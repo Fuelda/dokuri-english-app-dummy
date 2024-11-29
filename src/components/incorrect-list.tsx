@@ -29,7 +29,7 @@ export function IncorrectList({ userId }: IncorrectListProps) {
         .from("study_records")
         .select("*")
         .eq("user_id", userId)
-        .eq("mastered", false)
+        .eq("first_mastered", false)
         .order("next_review", { ascending: true });
 
       if (error) throw error;

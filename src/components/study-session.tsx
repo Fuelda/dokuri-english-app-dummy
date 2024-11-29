@@ -117,14 +117,36 @@ export function StudySession({ mode, userId }: StudySessionProps) {
           break;
       }
 
-      // 学習記録を保存
-      await supabase.from("study_records").upsert({
-        user_id: userId,
-        sentence_id: currentSentence.id,
-        result,
-        next_review: nextReview.toISOString(),
-        mastered: result === 4,
-      });
+      // 既存の学習記録を確認
+      const { data: existingRecord } = await supabase
+        .from("study_records")
+        .select()
+        .eq("user_id", userId)
+        .eq("sentence_id", currentSentence.id)
+        .single();
+
+      if (existingRecord) {
+        // 既存の記録がある場合は更新
+        await supabase
+          .from("study_records")
+          .update({
+            result,
+            next_review: nextReview.toISOString(),
+            mastered: result === 4,
+          })
+          .eq("user_id", userId)
+          .eq("sentence_id", currentSentence.id);
+      } else {
+        // 新規の場合は挿入
+        await supabase.from("study_records").insert({
+          user_id: userId,
+          sentence_id: currentSentence.id,
+          result,
+          next_review: nextReview.toISOString(),
+          mastered: result === 4,
+          first_mastered: result === 4,
+        });
+      }
 
       // 次の問題を読み込む
       await loadNextSentence();

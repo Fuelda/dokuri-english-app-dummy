@@ -22,7 +22,7 @@ export function IncorrectListSummary() {
         .from("study_records")
         .select("*", { count: "exact", head: true })
         .eq("user_id", session.user.id)
-        .eq("mastered", false)
+        .eq("first_mastered", false)
         .gt("next_review", new Date().toISOString());
 
       if (error) {
