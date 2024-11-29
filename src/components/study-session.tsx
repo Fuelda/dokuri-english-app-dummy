@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Sentence, StudyMode, AnswerResult } from "@/types";
 import { sentences } from "@/data/sentences";
-import { AudioPlayer } from "./audio-player";
-import { AnswerButtons } from "./answer-buttons";
+import { AudioPlayer } from "@/components/audio-player";
+import { AnswerButtons } from "@/components/answer-buttons";
 
 interface StudySessionProps {
   mode: StudyMode;
@@ -104,13 +104,16 @@ export function StudySession({ mode, userId }: StudySessionProps) {
       const nextReview = new Date();
       switch (result) {
         case 1: // もう一度
-          nextReview.setHours(nextReview.getHours() + 1);
+          nextReview.setMinutes(nextReview.getMinutes() + 1);
           break;
-        case 2: // 微妙
-          nextReview.setDate(nextReview.getDate() + 3);
+        case 2: // 難しい
+          nextReview.setMinutes(nextReview.getMinutes() + 6);
           break;
-        case 3: // 聞き取れた
-          nextReview.setDate(nextReview.getDate() + 7);
+        case 3: // 正解
+          nextReview.setMinutes(nextReview.getMinutes() + 10);
+          break;
+        case 4: // 簡単
+          nextReview.setDate(nextReview.getDate() + 5);
           break;
       }
 
@@ -120,7 +123,7 @@ export function StudySession({ mode, userId }: StudySessionProps) {
         sentence_id: currentSentence.id,
         result,
         next_review: nextReview.toISOString(),
-        mastered: result === 3,
+        mastered: result === 4,
       });
 
       // 次の問題を読み込む

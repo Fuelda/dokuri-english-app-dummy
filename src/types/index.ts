@@ -7,8 +7,8 @@ export interface Sentence {
 // 学習モードの型定義
 export type StudyMode = "new" | "review" | "mixed";
 
-// 回答結果の型定義（1: もう一度, 2: 微妙, 3: 聞き取れた）
-export type AnswerResult = 1 | 2 | 3;
+// 回答結果の型定義（1: もう一度, 2: 難しい, 3: 正解, 4: 簡単）
+export type AnswerResult = 1 | 2 | 3 | 4;
 
 // 学習記録の型定義
 export interface StudyRecord {
@@ -16,7 +16,7 @@ export interface StudyRecord {
   userId: string;
   sentenceId: string;
   result: AnswerResult;
-  nextReview: Date;
+  next_review: Date;
   mastered: boolean;
   createdAt: Date;
 }

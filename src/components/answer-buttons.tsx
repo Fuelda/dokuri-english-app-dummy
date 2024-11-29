@@ -23,7 +23,7 @@ export function AnswerButtons({ onAnswer, disabled }: AnswerButtonsProps) {
         disabled={disabled}
         className="w-full py-3 px-4 rounded-md text-white bg-yellow-500 hover:bg-yellow-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 disabled:opacity-50 transition-colors"
       >
-        微妙
+        難しい
       </button>
 
       <button
@@ -31,7 +31,15 @@ export function AnswerButtons({ onAnswer, disabled }: AnswerButtonsProps) {
         disabled={disabled}
         className="w-full py-3 px-4 rounded-md text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 transition-colors"
       >
-        聞き取れた
+        正解
+      </button>
+
+      <button
+        onClick={() => onAnswer(4)}
+        disabled={disabled}
+        className="w-full py-3 px-4 rounded-md text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
+      >
+        簡単
       </button>
     </div>
   );

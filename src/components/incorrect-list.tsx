@@ -33,13 +33,12 @@ export function IncorrectList({ userId }: IncorrectListProps) {
         .order("next_review", { ascending: true });
 
       if (error) throw error;
-      console.log(data);
+
       // 文章データと結合
       const itemsWithSentences = (data || []).map((record) => ({
         ...record,
-        sentence: sentences.find((s) => s.id === record.sentenceId)!,
+        sentence: sentences.find((s) => s.id === record.sentence_id)!,
       }));
-      console.log(itemsWithSentences);
       setItems(itemsWithSentences);
     } catch (error) {
       console.error("Error loading incorrect items:", error);
@@ -157,7 +156,14 @@ export function IncorrectList({ userId }: IncorrectListProps) {
             </div>
           </div>
           <div className="mt-4 text-sm text-gray-500">
-            次の復習日: {new Date(item.nextReview).toLocaleDateString()}
+            次の復習日:{" "}
+            {new Date(item.next_review).toLocaleString("ja-JP", {
+              year: "numeric",
+              month: "2-digit",
+              day: "2-digit",
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </div>
         </div>
       ))}
