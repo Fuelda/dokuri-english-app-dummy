@@ -33,13 +33,13 @@ export function IncorrectList({ userId }: IncorrectListProps) {
         .order("next_review", { ascending: true });
 
       if (error) throw error;
-
+      console.log(data);
       // 文章データと結合
       const itemsWithSentences = (data || []).map((record) => ({
         ...record,
         sentence: sentences.find((s) => s.id === record.sentenceId)!,
       }));
-
+      console.log(itemsWithSentences);
       setItems(itemsWithSentences);
     } catch (error) {
       console.error("Error loading incorrect items:", error);
