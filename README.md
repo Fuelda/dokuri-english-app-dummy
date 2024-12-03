@@ -20,6 +20,43 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Supabase のローカル開発環境のセットアップ
+
+1. 必要なツールのインストール:
+
+   ```bash
+   # Supabase CLIのインストール
+   brew install supabase/tap/supabase
+
+   # Dockerのインストール（まだの場合）
+   brew install --cask docker
+   ```
+
+2. Docker を起動し、Supabase を開始:
+
+   ```bash
+   # Supabaseのローカル環境を起動
+   supabase start
+
+   # 起動後、以下のURLでアクセス可能になります：
+   # Studio (データベース管理UI): http://localhost:54323
+   # API URL: http://localhost:54321
+   # DB URL: postgresql://postgres:postgres@localhost:54322/postgres
+   ```
+
+3. 開発が終わったら:
+
+   ```bash
+   # Supabaseを停止
+   supabase stop
+   ```
+
+4. データベースのリセット:
+   ```bash
+   # 必要な場合、データベースをリセット
+   supabase db reset
+   ```
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

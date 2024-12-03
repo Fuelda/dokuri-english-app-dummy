@@ -55,17 +55,17 @@ classDiagram
         +Int result
         +DateTime nextReview
         +Boolean mastered
+        +Boolean first_mastered
         +save()
     }
-    class Sentence {
-        +String id
-        +String content
-        +getAudio()
+    class SentenceManager {
+        +loadSentences()
+        +getSentenceById()
+        +getAudioUrl()
     }
     User "1" -- "*" StudySession
     User "1" -- "*" StudyRecord
     StudySession "1" -- "*" StudyRecord
-    StudyRecord "*" -- "1" Sentence
 
 %% 4. アクティビティ図
 stateDiagram-v2
@@ -91,7 +91,6 @@ stateDiagram-v2
 %% 6. ER図
 erDiagram
     Users ||--o{ StudyRecords : "creates"
-    StudyRecords }o--|| Sentences : "references"
     
     Users {
         uuid id PK
@@ -101,15 +100,12 @@ erDiagram
     StudyRecords {
         uuid id PK
         uuid user_id FK
-        string sentence_id FK
+        string sentence_id
         integer result
         timestamp next_review
         boolean mastered
+        boolean first_mastered
         timestamp created_at
-    }
-    Sentences {
-        string id PK
-        string content
     }
 
 %% 7. データフロー図
@@ -119,11 +115,13 @@ flowchart TD
     Auth[認証システム]
     DB[(データベース)]
     TTS[音声合成API]
+    JSON[sentences.json]
 
     User -->|操作| Client
     Client -->|認証| Auth
     Client -->|データ取得/保存| DB
     Client -->|音声リクエスト| TTS
+    JSON -->|静的データ読み込み| Client
     TTS -->|音声データ| Client
     Client -->|表示/再生| User
 
