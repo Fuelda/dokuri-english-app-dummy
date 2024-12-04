@@ -79,14 +79,24 @@ stateDiagram-v2
     CheckContinue --> [*]: 終了
 
 %% 5. 状態遷移図
-stateDiagram-v2
+stateDiagram
     [*] --> New
     New --> InProgress: 開始
-    InProgress --> Answered: 回答
-    Answered --> Mastered: 完璧
-    Answered --> Review: 要復習
+    InProgress --> FirstAnswered: 初回回答
+    
+    FirstAnswered --> PerfectFirstTry: 完璧 \n(first_mastered=true)
+    FirstAnswered --> Review: 要復習 \n(first_mastered=false)
+    
+    PerfectFirstTry --> [*]: 学習完了
+
+    Review --> IncorrectList: 誤答リストに追加
     Review --> InProgress: 再学習
-    Mastered --> [*]
+    InProgress --> ReAnswered: 再回答
+    
+    ReAnswered --> Mastered: 完璧 \n(mastered=true)
+    ReAnswered --> Review: 要復習
+    
+    Mastered --> [*]: 学習完了
 
 %% 6. ER図
 erDiagram
