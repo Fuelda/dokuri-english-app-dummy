@@ -25,20 +25,50 @@ export function IncorrectList({ userId }: IncorrectListProps) {
   const loadIncorrectItems = async () => {
     try {
       const supabase = createClient();
-      const { data, error } = await supabase
+
+      // 通常の問題の取得
+      const { data: standardRecords, error: standardError } = await supabase
         .from("study_records")
         .select("*")
         .eq("user_id", userId)
-        .eq("first_mastered", false)
+        .eq("mastered", false)
+        .lt("next_review", new Date().toISOString())
         .order("next_review", { ascending: true });
 
-      if (error) throw error;
+      if (standardError) throw standardError;
+
+      // ユーザー作成の問題の取得
+      const { data: userSentences, error: userError } = await supabase
+        .from("user_sentences")
+        .select("*")
+        .eq("user_id", userId)
+        .eq("is_active", true);
+
+      if (userError) throw userError;
+
+      // 通常の問題とユーザー作成の問題を結合
+      const allSentences = [
+        ...sentences,
+        ...(userSentences || []).map((us) => ({
+          id: us.id,
+          content: us.content,
+        })),
+      ];
 
       // 文章データと結合
-      const itemsWithSentences = (data || []).map((record) => ({
-        ...record,
-        sentence: sentences.find((s) => s.id === record.sentence_id)!,
-      }));
+      const itemsWithSentences = (standardRecords || [])
+        .map((record) => {
+          const sentence = allSentences.find(
+            (s) => s.id === record.sentence_id
+          );
+          if (!sentence) return null;
+          return {
+            ...record,
+            sentence,
+          };
+        })
+        .filter((item): item is IncorrectItem => item !== null);
+
       setItems(itemsWithSentences);
     } catch (error) {
       console.error("Error loading incorrect items:", error);
@@ -113,6 +143,9 @@ export function IncorrectList({ userId }: IncorrectListProps) {
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <AudioPlayer text={item.sentence.content} />
+              <div className="mt-2 text-sm text-gray-600">
+                学習回数: {item.studyCount}回
+              </div>
             </div>
             <div className="ml-4 flex space-x-2">
               <button
@@ -157,7 +190,7 @@ export function IncorrectList({ userId }: IncorrectListProps) {
           </div>
           <div className="mt-4 text-sm text-gray-500">
             次の復習日:{" "}
-            {new Date(item.next_review).toLocaleString("ja-JP", {
+            {new Date(item.nextReview).toLocaleString("ja-JP", {
               year: "numeric",
               month: "2-digit",
               day: "2-digit",
