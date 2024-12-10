@@ -20,6 +20,7 @@ export function StudySession({ mode, userId }: StudySessionProps) {
 
   useEffect(() => {
     loadNextSentence();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadNextSentence = async () => {
@@ -128,8 +129,7 @@ export function StudySession({ mode, userId }: StudySessionProps) {
       const studyCount = (existingRecord?.study_count || 0) + 1;
 
       // 完璧判定：初回（study_count = 1）で「聞き取れた」、または2回目以降の「聞き取れた」
-      const mastered =
-        result === 3 && (studyCount === 1 || existingRecord?.mastered);
+      const mastered = result === 3;
 
       if (existingRecord) {
         // 既存の記録がある場合は更新

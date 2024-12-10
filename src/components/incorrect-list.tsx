@@ -20,6 +20,7 @@ export function IncorrectList({ userId }: IncorrectListProps) {
 
   useEffect(() => {
     loadIncorrectItems();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const loadIncorrectItems = async () => {
@@ -31,28 +32,28 @@ export function IncorrectList({ userId }: IncorrectListProps) {
         .from("study_records")
         .select("*")
         .eq("user_id", userId)
-        .eq("mastered", false)
-        .lt("next_review", new Date().toISOString())
+        .or("mastered.eq.false,study_count.gte.2")
         .order("next_review", { ascending: true });
 
       if (standardError) throw standardError;
 
-      // ユーザー作成の問題の取得
-      const { data: userSentences, error: userError } = await supabase
-        .from("user_sentences")
-        .select("*")
-        .eq("user_id", userId)
-        .eq("is_active", true);
+      // TODO: ユーザー作成の問題の取得
+      // // ユーザー作成の問題の取得
+      // const { data: userSentences, error: userError } = await supabase
+      //   .from("user_sentences")
+      //   .select("*")
+      //   .eq("user_id", userId)
+      //   .eq("is_active", true);
 
-      if (userError) throw userError;
+      // if (userError) throw userError;
 
       // 通常の問題とユーザー作成の問題を結合
       const allSentences = [
         ...sentences,
-        ...(userSentences || []).map((us) => ({
-          id: us.id,
-          content: us.content,
-        })),
+        // ...(userSentences || []).map((us) => ({
+        //   id: us.id,
+        //   content: us.content,
+        // })),
       ];
 
       // 文章データと結合
@@ -144,7 +145,7 @@ export function IncorrectList({ userId }: IncorrectListProps) {
             <div className="flex-1">
               <AudioPlayer text={item.sentence.content} />
               <div className="mt-2 text-sm text-gray-600">
-                学習回数: {item.studyCount}回
+                学習回数: {item.study_count}回
               </div>
             </div>
             <div className="ml-4 flex space-x-2">
@@ -190,7 +191,7 @@ export function IncorrectList({ userId }: IncorrectListProps) {
           </div>
           <div className="mt-4 text-sm text-gray-500">
             次の復習日:{" "}
-            {new Date(item.nextReview).toLocaleString("ja-JP", {
+            {new Date(item.next_review).toLocaleString("ja-JP", {
               year: "numeric",
               month: "2-digit",
               day: "2-digit",

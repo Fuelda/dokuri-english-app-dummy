@@ -23,14 +23,14 @@ export type AnswerResult = 1 | 2 | 3;
 // 学習記録の型定義
 export interface StudyRecord {
   id: string;
-  userId: string;
-  sentenceId: string;
+  user_id: string;
+  sentence_id: string;
   result: AnswerResult;
-  nextReview: Date;
+  next_review: Date;
   mastered: boolean;
-  studyCount: number;
-  createdAt: Date;
-  updatedAt: Date;
+  study_count: number;
+  created_at: Date;
+  updated_at: Date;
 }
 
 // ユーザー情報の型定義
@@ -38,8 +38,8 @@ export interface User {
   id: string;
   email: string;
   username: string;
-  createdAt: Date;
-  updatedAt: Date;
+  created_at: Date;
+  updated_at: Date;
 }
 
 // 学習セッションの型定義
