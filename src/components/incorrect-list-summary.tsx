@@ -18,12 +18,15 @@ export function IncorrectListSummary() {
       } = await supabase.auth.getSession();
       if (!session) return;
 
+      // 要復習の条件：
+      // 1. masteredがfalse（完璧でない）
+      // 2. 次の復習日が現在より前（復習が必要）
       const { count, error } = await supabase
         .from("study_records")
         .select("*", { count: "exact", head: true })
         .eq("user_id", session.user.id)
-        .eq("first_mastered", false)
-        .gt("next_review", new Date().toISOString());
+        .eq("mastered", false)
+        .lt("next_review", new Date().toISOString());
 
       if (error) {
         console.error("Error fetching incorrect count:", error);

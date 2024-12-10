@@ -1,4 +1,4 @@
-　-- Enable required extensions
+-- Enable required extensions
 create extension if not exists "uuid-ossp";
 
 -- profiles table
@@ -62,6 +62,17 @@ create table study_records (
   result smallint not null check (result between 1 and 3),
   next_review timestamp with time zone not null,
   mastered boolean default false not null,
+  study_count integer default 0 not null,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+-- user_sentences table
+create table user_sentences (
+  id uuid primary key default uuid_generate_v4(),
+  user_id uuid references auth.users not null,
+  content text not null,
+  is_active boolean default true not null,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null,
   updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
@@ -69,9 +80,11 @@ create table study_records (
 -- インデックス
 create index study_records_user_id_idx on study_records(user_id);
 create index study_records_next_review_idx on study_records(next_review);
+create index user_sentences_user_id_idx on user_sentences(user_id);
 
 -- RLSポリシー
 alter table study_records enable row level security;
+alter table user_sentences enable row level security;
 
 create policy "学習記録は本人のみが参照可能"
   on study_records for select
@@ -89,8 +102,30 @@ create policy "学習記録は本人のみが削除可能"
   on study_records for delete
   using (auth.uid() = user_id);
 
+create policy "ユーザー文は本人のみが参照可能"
+  on user_sentences for select
+  using (auth.uid() = user_id);
+
+create policy "ユーザー文は本人のみが作成可能"
+  on user_sentences for insert
+  with check (auth.uid() = user_id);
+
+create policy "ユーザー文は本人のみが更新可能"
+  on user_sentences for update
+  using (auth.uid() = user_id);
+
+create policy "ユーザー文は本人のみが削除可能"
+  on user_sentences for delete
+  using (auth.uid() = user_id);
+
 -- トリガー：学習記録の更新日時を自動更新
 create trigger on_study_records_updated
   before update on study_records
+  for each row
+  execute procedure handle_updated_at();
+
+-- トリガー：ユーザー文の更新日時を自動更新
+create trigger on_user_sentences_updated
+  before update on user_sentences
   for each row
   execute procedure handle_updated_at();

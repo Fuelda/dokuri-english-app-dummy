@@ -93,29 +93,28 @@ export function StudySession({ mode, userId }: StudySessionProps) {
     return sentences.filter((s) => reviewIds.has(s.id));
   };
 
+  const calculateNextReview = (result: AnswerResult): Date => {
+    const nextReview = new Date();
+    switch (result) {
+      case 1: // もう一度
+        nextReview.setHours(nextReview.getHours() + 1);
+        break;
+      case 2: // 微妙
+        nextReview.setDate(nextReview.getDate() + 3);
+        break;
+      case 3: // 聞き取れた
+        nextReview.setDate(nextReview.getDate() + 7);
+        break;
+    }
+    return nextReview;
+  };
+
   const handleAnswer = async (result: AnswerResult) => {
     if (!currentSentence || answering) return;
 
     setAnswering(true);
     try {
       const supabase = createClient();
-
-      // 次の復習日を計算
-      const nextReview = new Date();
-      switch (result) {
-        case 1: // もう一度
-          nextReview.setMinutes(nextReview.getMinutes() + 1);
-          break;
-        case 2: // 難しい
-          nextReview.setMinutes(nextReview.getMinutes() + 6);
-          break;
-        case 3: // 正解
-          nextReview.setMinutes(nextReview.getMinutes() + 10);
-          break;
-        case 4: // 簡単
-          nextReview.setDate(nextReview.getDate() + 5);
-          break;
-      }
 
       // 既存の学習記録を確認
       const { data: existingRecord } = await supabase
@@ -125,6 +124,13 @@ export function StudySession({ mode, userId }: StudySessionProps) {
         .eq("sentence_id", currentSentence.id)
         .single();
 
+      const nextReview = calculateNextReview(result);
+      const studyCount = (existingRecord?.study_count || 0) + 1;
+
+      // 完璧判定：初回（study_count = 1）で「聞き取れた」、または2回目以降の「聞き取れた」
+      const mastered =
+        result === 3 && (studyCount === 1 || existingRecord?.mastered);
+
       if (existingRecord) {
         // 既存の記録がある場合は更新
         await supabase
@@ -132,7 +138,8 @@ export function StudySession({ mode, userId }: StudySessionProps) {
           .update({
             result,
             next_review: nextReview.toISOString(),
-            mastered: result === 4,
+            mastered,
+            study_count: studyCount,
           })
           .eq("user_id", userId)
           .eq("sentence_id", currentSentence.id);
@@ -143,8 +150,8 @@ export function StudySession({ mode, userId }: StudySessionProps) {
           sentence_id: currentSentence.id,
           result,
           next_review: nextReview.toISOString(),
-          mastered: result === 4,
-          first_mastered: result === 4,
+          mastered: result === 3, // 初回で「聞き取れた」なら完璧
+          study_count: 1,
         });
       }
 
