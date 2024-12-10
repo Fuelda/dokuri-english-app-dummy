@@ -100,7 +100,7 @@ export function IncorrectList({ userId }: IncorrectListProps) {
       const supabase = createClient();
       // 次の復習日を1ヶ月後に設定
       const nextReview = new Date();
-      nextReview.setMonth(nextReview.getMonth() + 1);
+      nextReview.setDate(nextReview.getDate() + 7);
 
       const { error } = await supabase
         .from("study_records")
