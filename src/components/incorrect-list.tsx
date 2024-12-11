@@ -37,31 +37,10 @@ export function IncorrectList({ userId }: IncorrectListProps) {
 
       if (standardError) throw standardError;
 
-      // TODO: ユーザー作成の問題の取得
-      // // ユーザー作成の問題の取得
-      // const { data: userSentences, error: userError } = await supabase
-      //   .from("user_sentences")
-      //   .select("*")
-      //   .eq("user_id", userId)
-      //   .eq("is_active", true);
-
-      // if (userError) throw userError;
-
-      // 通常の問題とユーザー作成の問題を結合
-      const allSentences = [
-        ...sentences,
-        // ...(userSentences || []).map((us) => ({
-        //   id: us.id,
-        //   content: us.content,
-        // })),
-      ];
-
       // 文章データと結合
       const itemsWithSentences = (standardRecords || [])
         .map((record) => {
-          const sentence = allSentences.find(
-            (s) => s.id === record.sentence_id
-          );
+          const sentence = sentences.find((s) => s.id === record.sentence_id);
           if (!sentence) return null;
           return {
             ...record,
@@ -83,7 +62,7 @@ export function IncorrectList({ userId }: IncorrectListProps) {
       const supabase = createClient();
       const { error } = await supabase
         .from("study_records")
-        .delete()
+        .update({ mastered: true, study_count: 1 })
         .eq("id", id);
 
       if (error) throw error;

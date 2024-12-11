@@ -53,8 +53,8 @@ export function UserSentencesList({ userId }: { userId: string }) {
 
   if (sentences.length === 0) {
     return (
-      <div className="text-gray-500 text-center py-4">
-        登録された英文はありません
+      <div className="bg-white rounded-lg shadow p-6 text-center">
+        <p className="text-gray-600">登録された英文はありません</p>
       </div>
     );
   }
