@@ -158,7 +158,7 @@ export function StudySession({ mode, userId }: StudySessionProps) {
           .eq("sentence_id", currentSentence.id);
       } else {
         // 新規の場合は挿入
-        await supabase.from("study_records").insert({
+        const { error } = await supabase.from("study_records").insert({
           user_id: userId,
           sentence_id: currentSentence.id,
           result,
@@ -166,6 +166,7 @@ export function StudySession({ mode, userId }: StudySessionProps) {
           mastered,
           study_count: 1,
         });
+        console.log(error?.message);
       }
 
       // 次の問題を読み込む

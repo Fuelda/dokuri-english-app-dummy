@@ -30,6 +30,16 @@ export function Header() {
 
           <nav className="flex items-center space-x-4">
             <Link
+              href="/sentences/add"
+              className={`text-sm ${
+                pathname === "/sentences/add"
+                  ? "text-indigo-600"
+                  : "text-gray-600 hover:text-gray-900"
+              }`}
+            >
+              英文追加
+            </Link>
+            <Link
               href="/incorrect"
               className={`text-sm ${
                 pathname === "/incorrect"
