@@ -2,22 +2,24 @@ import { StudySession } from "@/components/study-session";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
-export default async function StudyPage({
-  searchParams,
-}: {
-  searchParams: { mode?: string };
-}) {
-  const supabase = await createClient();
-  const {
-    data: { session },
-  } = await supabase.auth.getSession();
+interface PageProps {
+  searchParams: Promise<{ mode?: string }>;
+}
 
-  if (!session) {
+export default async function StudyPage({ searchParams }: PageProps) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+    error,
+  } = await supabase.auth.getUser();
+
+  if (error || !user) {
     redirect("/login");
   }
 
-  // モードのバリデーション
-  const mode = searchParams.mode;
+  const params = await searchParams;
+  const mode = params.mode;
   if (!mode || !["new", "review", "mixed"].includes(mode)) {
     redirect("/");
   }
@@ -27,7 +29,7 @@ export default async function StudyPage({
       <div className="space-y-6">
         <StudySession
           mode={mode as "new" | "review" | "mixed"}
-          userId={session.user.id}
+          userId={user.id}
         />
       </div>
     </main>
