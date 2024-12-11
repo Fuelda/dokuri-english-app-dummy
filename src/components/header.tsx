@@ -40,9 +40,9 @@ export function Header() {
               英文追加
             </Link>
             <Link
-              href="/incorrect"
+              href="/logs"
               className={`text-sm ${
-                pathname === "/incorrect"
+                pathname === "/logs"
                   ? "text-indigo-600"
                   : "text-gray-600 hover:text-gray-900"
               }`}

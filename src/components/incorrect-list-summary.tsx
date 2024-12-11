@@ -1,11 +1,10 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Link from "next/link";
 
 export function IncorrectListSummary() {
-  const router = useRouter();
   const [incorrectCount, setIncorrectCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
 
@@ -40,10 +39,6 @@ export function IncorrectListSummary() {
     fetchIncorrectCount();
   }, []);
 
-  const handleClick = () => {
-    router.push("/incorrect");
-  };
-
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-6 animate-pulse">
@@ -59,12 +54,12 @@ export function IncorrectListSummary() {
       <p className="text-gray-600 mb-4">
         現在 {incorrectCount} 問の復習が必要です
       </p>
-      <button
-        onClick={handleClick}
+      <Link
+        href="/logs"
         className="text-indigo-600 hover:text-indigo-800 font-medium"
       >
         マイ英文リストを見る →
-      </button>
+      </Link>
     </div>
   );
 }
