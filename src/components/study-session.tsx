@@ -106,6 +106,9 @@ export function StudySession({ mode, userId }: StudySessionProps) {
       case 3: // 聞き取れた
         nextReview.setDate(nextReview.getDate() + 7);
         break;
+      case 4: // 完璧
+        nextReview.setDate(nextReview.getDate() + 30);
+        break;
     }
     return nextReview;
   };
@@ -128,8 +131,8 @@ export function StudySession({ mode, userId }: StudySessionProps) {
       const nextReview = calculateNextReview(result);
       const studyCount = (existingRecord?.study_count || 0) + 1;
 
-      // 完璧判定：初回（study_count = 1）で「聞き取れた」、または2回目以降の「聞き取れた」
-      const mastered = result === 3;
+      // 完璧判定
+      const mastered = result === 4;
 
       if (existingRecord) {
         // 既存の記録がある場合は更新
@@ -150,7 +153,7 @@ export function StudySession({ mode, userId }: StudySessionProps) {
           sentence_id: currentSentence.id,
           result,
           next_review: nextReview.toISOString(),
-          mastered: result === 3, // 初回で「聞き取れた」なら完璧
+          mastered,
           study_count: 1,
         });
       }
