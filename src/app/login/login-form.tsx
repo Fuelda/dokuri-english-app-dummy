@@ -50,7 +50,17 @@ export function LoginForm() {
         password: data.password,
       });
 
-      if (error) throw error;
+      if (error) {
+        // エラーメッセージを日本語に変換
+        let japaneseErrorMessage = "予期せぬエラーが発生しました";
+        if (error.message === "Invalid login credentials") {
+          japaneseErrorMessage =
+            "メールアドレスまたはパスワードが正しくありません";
+        } else if (error.message === "Email not confirmed") {
+          japaneseErrorMessage = "メールアドレスが確認されていません";
+        }
+        throw new Error(japaneseErrorMessage);
+      }
 
       // 成功したらダッシュボードへ
       router.push("/");
