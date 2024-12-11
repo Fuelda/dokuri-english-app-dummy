@@ -146,7 +146,7 @@ export function StudySession({ mode, userId }: StudySessionProps) {
 
       if (existingRecord) {
         // 既存の記録がある場合は更新
-        await supabase
+        const { error: updateError } = await supabase
           .from("study_records")
           .update({
             result,
@@ -156,17 +156,26 @@ export function StudySession({ mode, userId }: StudySessionProps) {
           })
           .eq("user_id", userId)
           .eq("sentence_id", currentSentence.id);
+
+        if (updateError) {
+          console.error("Error updating record:", updateError);
+        }
       } else {
         // 新規の場合は挿入
-        const { error } = await supabase.from("study_records").insert({
-          user_id: userId,
-          sentence_id: currentSentence.id,
-          result,
-          next_review: nextReview.toISOString(),
-          mastered,
-          study_count: 1,
-        });
-        console.log(error?.message);
+        const { error: insertError } = await supabase
+          .from("study_records")
+          .insert({
+            user_id: userId,
+            sentence_id: currentSentence.id,
+            result,
+            next_review: nextReview.toISOString(),
+            mastered,
+            study_count: 1,
+          });
+
+        if (insertError) {
+          console.error("Error inserting record:", insertError);
+        }
       }
 
       // 次の問題を読み込む
