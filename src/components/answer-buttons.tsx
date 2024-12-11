@@ -37,7 +37,7 @@ export function AnswerButtons({ onAnswer, disabled }: AnswerButtonsProps) {
       <button
         onClick={() => onAnswer(4)}
         disabled={disabled}
-        className="w-full py-3 px-4 rounded-md text-white bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 transition-colors"
+        className="w-full py-3 px-4 rounded-md text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 transition-colors"
       >
         完璧
       </button>

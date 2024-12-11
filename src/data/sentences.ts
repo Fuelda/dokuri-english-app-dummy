@@ -41,4 +41,20 @@ export const sentences: Sentence[] = [
     id: "10",
     content: "Let's meet again next week.",
   },
+  {
+    id: "11",
+    content: "Let's meet again next week.",
+  },
+  {
+    id: "12",
+    content: "Let's meet again next week.",
+  },
+  {
+    id: "13",
+    content: "Let's meet again next week.",
+  },
+  {
+    id: "14",
+    content: "Let's meet again next week.",
+  },
 ];
