@@ -1,4 +1,4 @@
-import { AddSentenceForm } from "./components/add-sentence-form";
+import { AddSentenceForm } from "../../../components/add-sentence-form";
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 

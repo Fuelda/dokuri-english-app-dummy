@@ -47,7 +47,7 @@ export function Header() {
                   : "text-gray-600 hover:text-gray-900"
               }`}
             >
-              誤答リスト
+              マイ英文リスト
             </Link>
             <button
               onClick={handleSignOut}

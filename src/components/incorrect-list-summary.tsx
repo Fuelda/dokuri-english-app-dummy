@@ -63,7 +63,7 @@ export function IncorrectListSummary() {
         onClick={handleClick}
         className="text-indigo-600 hover:text-indigo-800 font-medium"
       >
-        誤答リストを見る →
+        マイ英文リストを見る →
       </button>
     </div>
   );
