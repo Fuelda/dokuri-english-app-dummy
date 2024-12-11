@@ -7,7 +7,7 @@ export default async function StudyPage({
 }: {
   searchParams: { mode?: string };
 }) {
-  const supabase = createClient();
+  const supabase = await createClient();
   const {
     data: { session },
   } = await supabase.auth.getSession();
