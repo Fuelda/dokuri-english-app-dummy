@@ -16,45 +16,55 @@ export function StudySession({ mode, userId }: StudySessionProps) {
   const [currentSentence, setCurrentSentence] = useState<Sentence | null>(null);
   const [loading, setLoading] = useState(true);
   const [answering, setAnswering] = useState(false);
-  const [progress, setProgress] = useState(0);
+  const [totalQuestions, setTotalQuestions] = useState(0);
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [availableQuestions, setAvailableQuestions] = useState<Sentence[]>([]);
 
+  // 初回ロード時に利用可能な問題を取得
   useEffect(() => {
-    loadNextSentence();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const initializeSession = async () => {
+      setLoading(true);
+      try {
+        const supabase = createClient();
+        let questions: Sentence[] = [];
+
+        if (mode === "new" || mode === "mixed") {
+          const unusedSentences = await getUnusedSentences(supabase);
+          questions = [...questions, ...unusedSentences];
+        }
+        if (mode === "review" || mode === "mixed") {
+          const reviewSentences = await getReviewSentences(supabase);
+          questions = [...questions, ...reviewSentences];
+        }
+
+        // ランダムに並び替え
+        const shuffledQuestions = questions.sort(() => Math.random() - 0.5);
+        setAvailableQuestions(shuffledQuestions);
+        setTotalQuestions(shuffledQuestions.length);
+
+        // 最初の問題をセット
+        if (shuffledQuestions.length > 0) {
+          setCurrentSentence(shuffledQuestions[0]);
+          setCurrentQuestionIndex(1);
+        }
+      } catch (error) {
+        console.error("Error initializing session:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initializeSession();
+  }, [mode]);
 
   const loadNextSentence = async () => {
     setLoading(true);
     try {
-      const supabase = createClient();
-
-      // モードに応じて問題を取得
-      let nextSentence: Sentence | null = null;
-      if (mode === "new" || mode === "mixed") {
-        // 新規問題からランダムに選択
-        const unusedSentences = await getUnusedSentences(supabase);
-        if (unusedSentences.length > 0) {
-          nextSentence =
-            unusedSentences[Math.floor(Math.random() * unusedSentences.length)];
-        }
-      }
-
-      if (!nextSentence && (mode === "review" || mode === "mixed")) {
-        // 復習が必要な問題を取得
-        const reviewSentences = await getReviewSentences(supabase);
-        if (reviewSentences.length > 0) {
-          nextSentence =
-            reviewSentences[Math.floor(Math.random() * reviewSentences.length)];
-        }
-      }
-
-      if (!nextSentence) {
-        // 利用可能な問題がない場合
+      if (currentQuestionIndex >= availableQuestions.length) {
         setCurrentSentence(null);
-        setProgress(100);
       } else {
-        setCurrentSentence(nextSentence);
-        setProgress((prev) => Math.min(prev + 10, 100));
+        setCurrentSentence(availableQuestions[currentQuestionIndex]);
+        setCurrentQuestionIndex((prev) => prev + 1);
       }
     } catch (error) {
       console.error("Error loading next sentence:", error);
@@ -201,15 +211,24 @@ export function StudySession({ mode, userId }: StudySessionProps) {
     <div className="space-y-8">
       <div className="bg-white rounded-lg shadow p-6">
         <div className="mb-8">
+          <div className="text-center mb-2 text-sm text-gray-600">
+            {`${currentQuestionIndex} / ${totalQuestions}問`}
+          </div>
           <div className="w-full bg-gray-200 rounded-full h-2 mb-4">
             <div
               className="bg-indigo-600 h-2 rounded-full transition-all"
-              style={{ width: `${progress}%` }}
+              style={{
+                width: `${
+                  totalQuestions > 0
+                    ? (currentQuestionIndex / totalQuestions) * 100
+                    : 0
+                }%`,
+              }}
             ></div>
           </div>
         </div>
 
-        <AudioPlayer text={currentSentence.content} />
+        <AudioPlayer text={currentSentence?.content || ""} />
       </div>
 
       <AnswerButtons onAnswer={handleAnswer} disabled={answering} />
