@@ -1,15 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 export function Header() {
   const pathname = usePathname();
+  const router = useRouter();
 
   const handleSignOut = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    // ログアウト確認ダイアログを表示
+    const isConfirmed = confirm("本当にログアウトしますか？");
+
+    if (isConfirmed) {
+      const supabase = createClient();
+      await supabase.auth.signOut();
+      router.push("/login");
+    }
   };
 
   // ログイン画面ではヘッダーを表示しない

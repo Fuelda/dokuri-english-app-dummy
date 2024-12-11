@@ -55,7 +55,6 @@ export function LoginForm() {
       // 成功したらダッシュボードへ
       router.push("/");
     } catch (error) {
-      console.error("Error signing in:", error);
       setServerError(
         error instanceof Error ? error.message : "予期せぬエラーが発生しました"
       );
