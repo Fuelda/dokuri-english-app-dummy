@@ -133,10 +133,10 @@ export function StudySession({ mode, userId }: StudySessionProps) {
       // 既存の学習記録を確認
       const { data: existingRecord } = await supabase
         .from("study_records")
-        .select()
+        .select("*")
         .eq("user_id", userId)
         .eq("sentence_id", currentSentence.id)
-        .single();
+        .maybeSingle();
 
       const nextReview = calculateNextReview(result);
       const studyCount = (existingRecord?.study_count || 0) + 1;
@@ -172,7 +172,6 @@ export function StudySession({ mode, userId }: StudySessionProps) {
             mastered,
             study_count: 1,
           });
-
         if (insertError) {
           console.error("Error inserting record:", insertError);
         }

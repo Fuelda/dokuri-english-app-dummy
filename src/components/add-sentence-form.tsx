@@ -20,13 +20,12 @@ export function AddSentenceForm() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      console.log("Current user:", user);
 
       if (!user) {
         throw new Error("認証されていません");
       }
 
-      const { data, error: insertError } = await supabase
+      const { error: insertError } = await supabase
         .from("user_sentences")
         .insert([
           {
@@ -37,14 +36,11 @@ export function AddSentenceForm() {
         ])
         .select();
 
-      console.log("Insert response:", { data, error: insertError });
-
       if (insertError) throw insertError;
 
       setContent("");
       setSuccessMessage("英文を追加しました");
     } catch (err) {
-      console.error("Error details:", err);
       setError(err instanceof Error ? err.message : "英文の追加に失敗しました");
     } finally {
       setIsSubmitting(false);
